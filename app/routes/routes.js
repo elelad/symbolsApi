@@ -34,7 +34,7 @@ module.exports = function (app, db) {
         }
         var lang = req.query.lang || "en";
         var repo = req.query.repo || "all";
-        var limit = req.query.limit || 50;
+        var limit = +req.query.limit || 50;
         if (limit > 50) limit = 50;
         query = query.toLowerCase();
         console.log(query);
