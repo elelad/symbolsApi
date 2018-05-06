@@ -58,7 +58,7 @@ module.exports = function (app, db) {
             })
             .limit(limit)
             .project({
-                score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "_id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
                 translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
             })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
             .sort({ score: { $meta: "textScore" } });
@@ -151,7 +151,7 @@ module.exports = function (app, db) {
             unsafe_result: (req.body.unsafe_result == undefined) ? false : req.body.unsafe_result,
             translations: req.body.translations
         };
-        console.log(symbol);
+        //console.log(symbol);
         if (!symbol.id || !symbol.name || !symbol.license || !symbol.license_url || !symbol.author || !symbol.author_url //!symbol._id || 
             || !symbol.repo_key || !symbol.extension || !symbol.image_url || !symbol.alt_url
             || !symbol.search_string || !symbol.unsafe_result.toString() || !symbol.translations //|| !symbol.source_url 
