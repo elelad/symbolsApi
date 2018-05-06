@@ -1,0 +1,39 @@
+
+
+body{
+    font-family: 'Abel', sans-serif;
+    background-color: rgba(0,0,0,0.1); /* linear-gradient(rgba(0,0,0,0.6) rgba(0,0,0,0.1)); */
+}
+
+.fill{
+    background-color: white;
+}
+
+.page{
+    max-width: 800px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.symbolThomb{
+    display: block;
+    width: 100px;
+    height: 100px;
+}
+
+#loading{
+    display: none;
+    /* position: relative;
+    right: 20px; */
+    background-color: white;
+    border-left-color: white; 
+}
+
+.center{
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    text-align: center;
+
+}

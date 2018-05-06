@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.11/css/all.css" integrity="sha384-p2jx59pefphTFIpeqCcISO9MdVfIm4pNnsL08A6v5vaQc4owkQqxMV8kg4Yvhaw/"
+    crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css" />
+
+  <title>SymboTalk API</title>
+</head>
+
+<body class="text-center">
+
+  <h1 class="mt-4">SymboTalk API</h1>
+  <h3>Search free AAC symbols</h3>
+  <br>
+
+
+  <div class="page pr-3 pl-3">
+    <div class="input-group">
+      <input id="query" type="text" class="form-control" placeholder="Search symbols..." aria-label="Search symbols" aria-describedby="basic-addon2">
+      <div class="input-group-append">
+        <!-- <span id="loading" class="input-group-text">
+          <i class="fas fa-spinner fa-lg fa-pulse"></i>
+        </span> -->
+        <button class="btn btn-outline-secondary" type="button" onclick="c.search()">
+          <i class="fas fa-search fa-lg"></i>
+        </button>
+        <!-- Search -->
+        <!-- <button class="btn btn-outline-secondary" type="button"> -->
+        <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false"
+          aria-controls="collapseExample">
+
+          <i class="fas fa-cog fa-lg"></i>
+        </button>
+        <!-- Setting -->
+
+      </div>
+    </div>
+    <div class="collapse page pt-2 pr-3 pl-3" id="collapseExample">
+      <div class="row fill">
+        <div class="col-sm p-0">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="symbolsSelect">Symbols</label>
+            </div>
+            <select class="custom-select" id="symbolsSelect">
+              <option value="all" selected>All</option>
+              <option value="arasaac">ARASAAC</option>
+              <option value="sclera">Sclera</option>
+              <option value="tawasol">Tawasol</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm p-0">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="langSelect">Language</label>
+            </div>
+            <select class="custom-select" id="langSelect">
+              <option value="en" selected>English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="pt">Portuguese</option>
+              <option value="ru">Russian</option>
+              <option value="iw">Hebrew</option>
+              <option value="ja">Japanese</option>
+              <option value="sv">Swedish</option>
+              <option value="nl">Dutch</option>
+              <option value="da">Danish</option>
+              <option value="hu">Hungarian</option>
+              <option value="pl">Polish</option>
+              <option value="cs">Czech</option>
+              <option value="no">Norwegian</option>
+              <option value="ko">Korean</option>
+              <option value="th">Thai</option>
+              <option value="tr">Turkish</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm p-0">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="limitSelect">Limit</label>
+            </div>
+            <select class="custom-select" id="limitSelect">
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+              <option value="40">40</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <ul id="sResults" class="list-group d-flex flex-column justify-content-between flex-fill text-left list-group-flush page">
+      <!-- <li class="list-group-item d-flex flex-row p-0 pr-3">
+        <div class="p-2">
+          <img alt="symbol" src="./img/storeLogo512.png" class="symbolThomb shadow-sm rounded" />
+        </div>
+        <div class="flex-grow-1 pt-2">
+          <h3>Name</h3>
+          <p>Details</p>
+        </div>
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-danger" type="button">More</button>
+        </div>
+
+      </li> -->
+
+    </ul>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script> -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+    crossorigin="anonymous"></script>
+  <script src="./symbotalkapi.js"></script>
+</body>
+
+</html>

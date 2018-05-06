@@ -1,0 +1,23 @@
+{
+  "name": "symbolsapiv1",
+  "version": "0.0.1",
+  "description": "api for aac symbols",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "test": "test",
+    "dev": "nodemon server.js --ignore data/ --delay 2"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mongodb": "^3.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.11",
+    "progress": "^2.0.0",
+    "replace": "^0.3.0"
+  }
+}
