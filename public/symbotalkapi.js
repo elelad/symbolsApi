@@ -44,7 +44,7 @@ c.dataToHtml = function (data) {
                     <img alt="symbol" src="${data[i].image_url}" class="symbolThomb shadow-sm rounded" />
                 </div>
                 <div class="flex-grow-1 pt-2">
-                    <h3>${data[i].translations[0].tName}</h3>
+                    <h3>${data[i].name}</h3>
                     <p>${data[i].name}</p>
                 </div>
                 <div class="d-flex align-items-center">
