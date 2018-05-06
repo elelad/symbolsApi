@@ -51,8 +51,8 @@ module.exports = function (app, db) {
         //if ()
         let curser = db.collection('symbols')
             .find({
-                repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" },//{$regex :}
-                $text: { $language: 'none', $search: query }//'none'lang
+                repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
+                $text: { $language: detectedLang, $search: query } //'none'lang
             })
             .limit(limit)
             .project({
@@ -67,8 +67,14 @@ module.exports = function (app, db) {
                     {
                         "name":
                             (query == 'a') ? query : { $regex: ".*" + query + ".*" }
-                    }).limit(limit);//
+                    }).limit(limit)
+                    .project({
+                        score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                        translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
+                    })
+                    .sort({ score: { $meta: "textScore" } });
                 newCurser.toArray().then(newArr => {
+                    console.log("found " + newArr.length + " results");
                     if (newArr.length == 0) {
                         res.send('no result');
                     } else {
@@ -143,6 +149,7 @@ module.exports = function (app, db) {
             unsafe_result: (req.body.unsafe_result) ? false : req.body.unsafe_result,
             translations: req.body.translations
         };
+        console.log(symbol);
         if (!symbol.id || !symbol.name || !symbol.license || !symbol.license_url || !symbol.author || !symbol.author_url //!symbol._id || 
             || !symbol.repo_key || !symbol.extension || !symbol.image_url || !symbol.alt_url
             || !symbol.search_string || !symbol.unsafe_result.toString() || !symbol.translations //|| !symbol.source_url 
