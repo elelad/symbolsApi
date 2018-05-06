@@ -1,8 +1,10 @@
 
 //const tCLi = require('@google-cloud/translate')({ keyFilename: './SymboTalk-28a623274f93.json' });
 var ObjectID = require('mongodb').ObjectID;
+const fs = require('fs');
 const adminToken = "symbotalk7777";
 var path = require('path');
+const supportedLanguages = ['da', 'nl', 'en','fi','fr','de','hu','it','nb','pt','ro','ru','es','sv','tr']
 //var stopWords = require('../../data/stopwords/en.txt');
 
 module.exports = function (app, db) {
@@ -42,21 +44,21 @@ module.exports = function (app, db) {
         console.log(limit);
         query = query.toLowerCase();
         console.log(query);
-        //tCLi.detect(query).then(detectRes => {
-        //console.log(detectRes[0]);
-        //let detectedLang = detectRes[0].language;
+        
         let detectedLang = lang;
-        //let curser;
-        //let curser = db.collection('symbols').find({ "name": { $regex: ".*" + query + ".*" } }).limit(50);
-        //if ()
+        let langForText =  (supportedLanguages.includes(lang))? lang : 'none';
+        let data = fs.readFileSync(path.join(__dirname,'../stop_words/' + langForText + '.txt'));
+        console.log('data.includes(query):');
+        console.log(data.includes(query));
+        
         let curser = db.collection('symbols')
             .find({
                 repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
-                $text: { $language: detectedLang, $search: query } //'none'lang
+                $text: { $language: langForText, $search: query } //'none'lang
             })
             .limit(limit)
             .project({
-                score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "_id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
                 translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
             })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
             .sort({ score: { $meta: "textScore" } });
