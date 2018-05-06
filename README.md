@@ -1,1 +1,1 @@
-# symbolsApiV1
+# SymboTalkApiV1
