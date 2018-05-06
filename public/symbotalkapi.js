@@ -17,7 +17,7 @@ c.search = function () {
     console.log(repo);
     let limit = $('#limitSelect').val();
     console.log(limit);
-    let url = c.searchUrl + '?name=' + q + '&?repo=' + repo + '&?lang=' + lang + '&?limit=' + limit;
+    let url = c.searchUrl + '?name=' + q + '&repo=' + repo + '&lang=' + lang + '&limit=' + limit;
     console.log(url);
     $.ajax({
         url: url,
