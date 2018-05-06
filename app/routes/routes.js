@@ -33,9 +33,12 @@ module.exports = function (app, db) {
             return;
         }
         var lang = req.query.lang || "en";
+        console.log(lang);
         var repo = req.query.repo || "all";
+        console.log(repo);
         var limit = +req.query.limit || 50;
         if (limit > 50) limit = 50;
+        console.log(limit);
         query = query.toLowerCase();
         console.log(query);
         //tCLi.detect(query).then(detectRes => {
