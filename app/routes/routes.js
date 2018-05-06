@@ -27,6 +27,7 @@ module.exports = function (app, db) {
 
 
     app.get('/search', (req, res) => {
+        console.log(req.query);
         var query = req.query.name || "";
         if (query == "") {
             res.send('no query');
@@ -60,7 +61,7 @@ module.exports = function (app, db) {
             })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
             .sort({ score: { $meta: "textScore" } });
         curser.toArray().then(arr => {
-            console.log(arr);
+            console.log("found " + arr.length + " results");
             if (arr.length == 0) {
                 let newCurser = db.collection('symbols').find(
                     {
