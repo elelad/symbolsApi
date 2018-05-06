@@ -146,7 +146,7 @@ module.exports = function (app, db) {
             image_url: req.body.image_url, // 'https://storage.googleapis.com/symbols/' + req.body.repo_key + '/' + req.body.name + '.' + req.body.extension
             alt_url: req.body.alt_url,
             search_string: req.body.search_string,
-            unsafe_result: (req.body.unsafe_result) ? false : req.body.unsafe_result,
+            unsafe_result: (req.body.unsafe_result == undefined) ? false : req.body.unsafe_result,
             translations: req.body.translations
         };
         console.log(symbol);
