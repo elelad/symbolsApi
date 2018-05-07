@@ -1,8 +1,10 @@
 
 console.log(jQuery);
-const c = {};
+var c = {};
+c.data = [];
 
 c.searchUrl = "https://symbotalkapiv1.azurewebsites.net/search/";
+c.symbolUrl = "https://symbotalkapiv1.azurewebsites.net/symbols/";
 //c.searchUrl = "localhost:1337/search/";
 
 c.search = function () {
@@ -28,6 +30,7 @@ c.search = function () {
 
 c.dataToHtml = function (data) {
     console.log(data);
+    c.data = data;
     var html = "";
     if (data == "no query") {
         html = "<span class='center'>Please search something...</span>"
@@ -38,17 +41,22 @@ c.dataToHtml = function (data) {
     }
     else {
         for (let i = 0; i < data.length; i++) {
+            console.log("for i: " + i);
+            //console.log(data[i].translations[0].tName);
+            let id = data[i].id;
+            let name = (data[i].translations) ? (data[i].translations[0].tName) : data[i].name;
             html += `
             <li class="list-group-item d-flex flex-row p-0 pr-3">
                 <div class="p-1">
                     <img alt="symbol" src="${data[i].image_url}" class="symbolThomb shadow-sm rounded" />
                 </div>
                 <div class="flex-grow-1 pt-2 pl-3">
-                    <h3>${data[i].translations[0].tName}</h3>
-                    <p>${data[i].name}</p>
+                    <h5>${name}</h5>
+                    <h6>From: ${data[i].repo_key}</h6>
+                    <p>License: ${data[i].license}</p>
                 </div>
                 <div class="d-flex align-items-center">
-                    <button class="btn btn-outline-danger" type="button">More</button>
+                    <button class="btn btn-outline-danger" type="button" onClick="c.more(${data[i].id})">More</button>
                 </div>
             </li>
         `
@@ -56,4 +64,16 @@ c.dataToHtml = function (data) {
     }
     $('#sResults').html(html);
     $('#loading').hide();
+}
+
+c.idToHtml = function(data){
+    console.log(data);
+}
+
+c.more = function(id){
+    console.log(id);
+    $.ajax({
+        url: c.symbolUrl + id,
+        success: c.idToHtml
+    })
 }
