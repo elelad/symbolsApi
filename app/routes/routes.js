@@ -4,7 +4,7 @@ var ObjectID = require('mongodb').ObjectID;
 const fs = require('fs');
 const adminToken = "symbotalk7777";
 var path = require('path');
-const supportedLanguages = ['da', 'nl', 'en','fi','fr','de','hu','it','nb','pt','ro','ru','es','sv','tr']
+const supportedLanguages = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr']
 //var stopWords = require('../../data/stopwords/en.txt');
 
 module.exports = function (app, db) {
@@ -42,58 +42,106 @@ module.exports = function (app, db) {
         var limit = +req.query.limit || 50;
         if (limit > 50) limit = 50;
         console.log(limit);
-        query = query.toLowerCase();
+        //query = query.toLowerCase();
         console.log(query);
-        
         let detectedLang = lang;
-        let langForText =  (supportedLanguages.includes(lang))? lang : 'none';
-        let data = fs.readFileSync(path.join(__dirname,'../stop_words/' + langForText + '.txt'));
-        console.log('data.includes(query):');
-        console.log(data.includes(query));
-        
-        let curser = db.collection('symbols')
-            .find({
-                repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
-                $text: { $language: langForText, $search: query } //'none'lang
-            })
-            .limit(limit)
-            .project({
-                score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
-                translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
-            })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
-            .sort({ score: { $meta: "textScore" } });
+        let langForText = (supportedLanguages.includes(lang)) ? lang : 'none';
+        let isStopWord = false; 
+        if ((supportedLanguages.includes(lang))) {
+            let data = fs.readFileSync(path.join(__dirname, '../stop_words/' + langForText + '.txt'));
+            console.log('data.includes(query):');
+            console.log(data.includes(query));
+            isStopWord = data.includes(query);
+        }
+        if (query.length == 1 ||  Number.isInteger(+query)) isStopWord = true;
+        if (isStopWord) langForText = "none";
+        let curser;
+        if (!isStopWord) {
+            console.log('not stop word, langForText: ' + langForText);
+            curser = db.collection('symbols')
+                .find({
+                    repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
+                    $text: { $language: langForText, $search: query },//'none'lang     
+                })
+                .limit(limit)
+                .project({
+                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                    translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
+                })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
+                .sort({ score: { $meta: "textScore" } });
+        } /* else if(query.length == 1) {
+            console.log('one letter');
+            curser = db.collection('symbols').find(
+                {$or: [{ "name": query}, { "name": query.toLowerCase()}, { "name": query.toUpperCase()}, { "name": "letter" + query}, { "name": "number" + query}] }
+                ).limit(limit)
+                .project({
+                    "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                    translations: { $elemMatch: { tLang: detectedLang } },//len: { $strLenBytes: "$name"  }, 
+                     //{ tLang : {$regex : ".*iw.*"}}}//
+                })
+                //.sort({ len: -1 });//: { $strLenBytes: "$name" } 
+            
+        } */ else {
+            console.log('stop word');
+            console.log(query.toUpperCase());
+            console.log(query.toLowerCase());
+            curser = db.collection('symbols')
+                .find({
+                    repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
+                    "translations": { $elemMatch: { tLang: detectedLang, tName: { $regex: "(^|\ )" + "(" + query + "|" + query.toLowerCase() + "|" + query.toUpperCase() + ")" + "($|\ ).*" } } },
+                    ///"translations.tName": {$regex: "(^|\ )" + query + "($|\ ).*"}//".*" +
+                    //$text: { $language: langForText, $search: query },//'none'lang
+                    //name: query,
+                    //"translations.tName": query
+                })
+                .limit(100)//limit
+                .project({
+                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                    translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
+                })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
+            //.sort({ score: { $meta: "textScore" } });
+            /* curser = db.collection('symbols').aggregate([
+                { $match: {name: query}},//(query == 'a') ? query : { $regex: ".*" + query + ".*" } 
+                { $project: { "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                translations: { $elemMatch: { tLang: detectedLang } }, len: { $strLenBytes: "$name" } } },
+                { $limit: limit },
+                {$sort: {len: -1} }
+            ]) */
+        }
         curser.toArray().then(arr => {
             console.log("found " + arr.length + " results");
             if (arr.length == 0) {
-                let newCurser = db.collection('symbols').find(
-                    {
-                        "name":
-                            (query == 'a') ? query : { $regex: ".*" + query + ".*" }
-                    }).limit(limit)
-                    .project({
-                        score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
-                        translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
-                    })
-                    .sort({ score: { $meta: "textScore" } });
-                newCurser.toArray().then(newArr => {
-                    console.log("found " + newArr.length + " results");
-                    if (newArr.length == 0) {
-                        res.send('no result');
-                    } else {
-                        res.send(newArr);
-                    }
-                }).catch(e => {
+                //let newCurser =
+                //newCurser.toArray().then(newArr => {
+                //console.log("found " + newArr.length + " results");
+                //if (newArr.length == 0) {
+                res.send('no result');
+                //} else {
+                //res.send(newArr);
+                //}
+                /* }).catch(e => {
                     console.log(e);
                     res.send({ 'error': 'An error has occurred' });
-                });
+                }); */
                 //res.send('no result');
             } else {
-
+                if (isStopWord) {
+                    arr.sort((a, b) => {
+                        if (a.name.length > b.name.length) {
+                            return 1;
+                        } else if (a.name.length < b.name.length) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    });
+                }
+                arr = arr.slice(0, limit);
                 res.send(arr);
             }
         }).catch(e => {
             console.log(e);
-            res.send({ 'error': 'An error has occurred' });
+            res.send({ 'error': 'An error has occurred: /n' + e });
         });
         //});
     });
