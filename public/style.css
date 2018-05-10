@@ -5,15 +5,32 @@ body{
     background-color: rgba(0,0,0,0.1); /* linear-gradient(rgba(0,0,0,0.6) rgba(0,0,0,0.1)); */
 }
 
-.fill{
-    background-color: white;
-}
-
 .page{
     max-width: 800px;
     position: relative;
     left: 50%;
     transform: translate(-50%);
+}
+
+.fotter{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    background-color: rgb(100,100,100);
+    color: white;
+
+    
+}
+
+.fotter a{
+    color: white;
+    text-decoration: underline;
 }
 
 .symbolThomb{
@@ -42,3 +59,4 @@ p{
     font-size: 0.8rem;
     
 }
+

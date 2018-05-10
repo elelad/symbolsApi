@@ -2,9 +2,13 @@
 //const tCLi = require('@google-cloud/translate')({ keyFilename: './SymboTalk-28a623274f93.json' });
 var ObjectID = require('mongodb').ObjectID;
 const fs = require('fs');
-const adminToken = "symbotalk7777";
+const dbConfig = require('../../config/db');
+const adminToken = dbConfig.myToken;
 var path = require('path');
-const supportedLanguages = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr']
+const supportedLanguagesForMongoSearch = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
+const symbolsTranslationsLanguages = ['fi', 'el', 'ro', 'sk', 'iw', 'fr', 'de', 'es', 'pt', 'ru', 'ja', 'sv', 'nl', 'da', 'hu', 'pl', 'no', 'ko', 'th', 'tr', 'cs', 'ar'];
+//const supportedLanguages = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
+
 //var stopWords = require('../../data/stopwords/en.txt');
 
 module.exports = function (app, db) {
@@ -29,31 +33,32 @@ module.exports = function (app, db) {
 
 
     app.get('/search', (req, res) => {
-        console.log(req.query);
+        //console.log(req.query);
+        // ------ Get prams form qouery -------
         var query = req.query.name || "";
-        if (query == "") {
+        if (query == "") { // if no query then out
             res.send('no query');
             return;
         }
         var lang = req.query.lang || "en";
-        console.log(lang);
+        //console.log(lang);
         var repo = req.query.repo || "all";
-        console.log(repo);
-        var limit = +req.query.limit || 50;
-        if (limit > 50) limit = 50;
-        console.log(limit);
+        //console.log(repo);
+        var limit = +req.query.limit || 20; 
+        if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
+        //console.log(limit);
         //query = query.toLowerCase();
-        console.log(query);
-        let detectedLang = lang;
-        let langForText = (supportedLanguages.includes(lang)) ? lang : 'none';
-        let isStopWord = false; 
-        if ((supportedLanguages.includes(lang))) {
+        //console.log(query);
+        let detectedLang = (symbolsTranslationsLanguages.includes(lang))? lang : "en"; // language to retrun at symbol (if not supprted then english)
+        let langForText = (supportedLanguagesForMongoSearch.includes(lang)) ? lang : 'none'; // language for mongo text search, if not supprted then do text search without stimming and stp words
+        let isStopWord = false;
+        if ((supportedLanguagesForMongoSearch.includes(lang))) { 
             let data = fs.readFileSync(path.join(__dirname, '../stop_words/' + langForText + '.txt'));
-            console.log('data.includes(query):');
-            console.log(data.includes(query));
+            //console.log('data.includes(query):');
+            //console.log(data.includes(query));
             isStopWord = data.includes(query);
         }
-        if (query.length == 1 ||  Number.isInteger(+query)) isStopWord = true;
+        if (query.length == 1 ||  Number.isInteger(+query)) isStopWord = true; // if user searching one letter or number then set it as stopWord
         if (isStopWord) langForText = "none";
         let curser;
         if (!isStopWord) {

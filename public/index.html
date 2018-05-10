@@ -13,100 +13,101 @@
     crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
-
+  <link rel="icon" href="./img/storeLogo512.png">
   <title>SymboTalk API</title>
 </head>
 
 <body class="text-center">
+  <div>
+    <h1 class="mt-4">SymboTalk API</h1>
+    <h3>Search free AAC symbols</h3>
+    <br>
 
-  <h1 class="mt-4">SymboTalk API</h1>
-  <h3>Search free AAC symbols</h3>
-  <br>
 
-
-  <div class="page pr-3 pl-3">
-    <div class="input-group">
-      <input id="query" type="text" class="form-control" placeholder="Search symbols..." aria-label="Search symbols" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <!-- <span id="loading" class="input-group-text">
+    <div class="page pr-3 pl-3">
+      <div class="input-group">
+        <input id="query" type="text" class="form-control" placeholder="Search symbols..." aria-label="Search symbols" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <!-- <span id="loading" class="input-group-text">
           <i class="fas fa-spinner fa-lg fa-pulse"></i>
         </span> -->
-        <button class="btn btn-outline-secondary" type="button" onclick="c.search()">
-          <i class="fas fa-search fa-lg"></i>
-        </button>
-        <!-- Search -->
-        <!-- <button class="btn btn-outline-secondary" type="button"> -->
-        <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false"
-          aria-controls="collapseExample">
+          <button class="btn btn-outline-secondary" type="button" onclick="c.search()">
+            <i class="fas fa-search fa-lg"></i>
+          </button>
+          <!-- Search -->
+          <!-- <button class="btn btn-outline-secondary" type="button"> -->
+          <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false"
+            aria-controls="collapseExample">
 
-          <i class="fas fa-cog fa-lg"></i>
-        </button>
-        <!-- Setting -->
+            <i class="fas fa-cog fa-lg"></i>
+          </button>
+          <!-- Setting -->
 
-      </div>
-    </div>
-    <div class="collapse page pt-2 pr-3 pl-3" id="collapseExample">
-      <div class="row fill">
-        <div class="col-sm p-0">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="symbolsSelect">Symbols</label>
-            </div>
-            <select class="custom-select" id="symbolsSelect">
-              <option value="all" selected>All</option>
-              <option value="arasaac">ARASAAC</option>
-              <option value="sclera">Sclera</option>
-              <option value="mulberry">Straight Street</option>
-              <option value="tawasol">Tawasol</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-sm p-0">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="langSelect">Language</label>
-            </div>
-            <select class="custom-select" id="langSelect">
-              <option value="en" selected>English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="pt">Portuguese</option>
-              <option value="ru">Russian</option>
-              <option value="iw">Hebrew</option>
-              <option value="ja">Japanese</option>
-              <option value="sv">Swedish</option>
-              <option value="nl">Dutch</option>
-              <option value="da">Danish</option>
-              <option value="hu">Hungarian</option>
-              <option value="pl">Polish</option>
-              <option value="cs">Czech</option>
-              <option value="no">Norwegian</option>
-              <option value="ko">Korean</option>
-              <option value="th">Thai</option>
-              <option value="tr">Turkish</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-sm p-0">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="limitSelect">Limit</label>
-            </div>
-            <select class="custom-select" id="limitSelect">
-              <option value="10" selected>10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="40">40</option>
-              <option value="50">50</option>
-            </select>
-          </div>
         </div>
       </div>
-    </div>
-    <br>
-    <ul id="sResults" class="list-group d-flex flex-column justify-content-between flex-fill text-left list-group-flush page">
-      <!-- <li class="list-group-item d-flex flex-row p-0 pr-3">
+      <div class="collapse page pt-2 pr-3 pl-3 tranparent" id="collapseExample">
+        <div class="row">
+          <div class="col-sm p-0">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="symbolsSelect">Symbols</label>
+              </div>
+              <select class="custom-select" id="symbolsSelect">
+                <option value="all" selected>All</option>
+                <option value="arasaac">ARASAAC</option>
+                <option value="sclera">Sclera</option>
+                <option value="mulberry">Straight Street</option>
+                <option value="tawasol">Tawasol</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm p-0">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="langSelect">Language</label>
+              </div>
+              <select class="custom-select" id="langSelect">
+                <option value="en" selected>English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+                <option value="iw">Hebrew</option>
+                <option value="ja">Japanese</option>
+                <option value="sv">Swedish</option>
+                <option value="nl">Dutch</option>
+                <option value="da">Danish</option>
+                <option value="hu">Hungarian</option>
+                <option value="pl">Polish</option>
+                <option value="cs">Czech</option>
+                <option value="no">Norwegian</option>
+                <option value="ko">Korean</option>
+                <option value="th">Thai</option>
+                <option value="tr">Turkish</option>
+                <option value="ar">Arabic</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm p-0">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="limitSelect">Limit</label>
+              </div>
+              <select class="custom-select" id="limitSelect">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <ul id="sResults" class="list-group d-flex flex-column justify-content-between flex-fill text-left list-group-flush page">
+        <!-- <li class="list-group-item d-flex flex-row p-0 pr-3">
         <div class="p-2">
           <img alt="symbol" src="./img/storeLogo512.png" class="symbolThomb shadow-sm rounded" />
         </div>
@@ -120,7 +121,77 @@
 
       </li> -->
 
-    </ul>
+      </ul>
+    </div>
+
+    <!-- Button trigger modal -->
+    <!-- <button type="button" class="btn btn-primary" onClick="c.more(84000)">
+    Launch demo modal
+  </button> -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="moreModal" tabindex="-1" role="dialog" aria-labelledby="moreModalLabel" aria-hidden="true">
+      <div class="modal-dialog  modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title" id="moreModalTitle">Title</h1>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row d-flex flex-row p-0 pr-3 pl-3 text-left">
+              <div class="p-1">
+                <img id="moreModalImage" alt="symbol" src="./img/storeLogo512.png" class="symbolThomb shadow-sm rounded" />
+              </div>
+              <div class="flex-grow-1 pl-3">
+                <p>
+                  <div id="moreModalFrom">From</div>
+                  <div id="moreModalLicense">License</div>
+                  <div id="moreModalAuthor">Author</div>
+                </p>
+              </div>
+            </div>
+            <br>
+            <div class="p-0 pr-3">
+              <h3>Translations</h3>
+              <br>
+              <div class="row">
+                <div class="col-sm">
+                  <ul id="moreModalTranslations1" class="list-group list-group-flush text-left">
+
+                  </ul>
+                </div>
+                <div class="col-sm">
+                  <ul id="moreModalTranslations2" class="list-group list-group-flush text-left">
+
+                  </ul>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+          <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fotter -->
+  <div class="fotter navbar-fixed-bottom">
+    <div class="pt-2 pr-4">
+      Created by:
+      <a href="https://www.symbotalk.com" target="blank">SymboTalk</a>
+    </div>
+    <div class="pt-2 pr-4">
+      See more:
+      <a href="#" target="blank">
+        <i class="fab fa-github fa-lg"></i>
+      </a>
+    </div>
   </div>
 
   <!-- Optional JavaScript -->
