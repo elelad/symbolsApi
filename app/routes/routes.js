@@ -42,7 +42,7 @@ module.exports = function (app, db) {
         // ------ Get prams form qouery -------
         var query = req.query.name || "";
         if (query == "") { // if no query then out
-            res.status(480);
+            //res.status(480);
             res.send({error: 'no query'});
             return;
         }
@@ -129,7 +129,7 @@ module.exports = function (app, db) {
                 //newCurser.toArray().then(newArr => {
                 //console.log("found " + newArr.length + " results");
                 //if (newArr.length == 0) {
-                res.status(480);
+                //res.status(480);
                 res.send({error: 'no result'});
                 //} else {
                 //res.send(newArr);
