@@ -1,7 +1,7 @@
 # SymboTalkApiV1
 
 
-Example for SymboTalkAPI - Search free AAC symbols for communication boards. 
+SymboTalkAPI - Search free AAC symbols for communication boards. 
 
 
-## 
+Doc: [SymboTalk API](https://github.com/elelad/SymboTalkAPIDocs)

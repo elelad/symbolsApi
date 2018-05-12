@@ -6,7 +6,8 @@ const dbConfig = require('../../config/db');
 const adminToken = dbConfig.myToken;
 var path = require('path');
 const supportedLanguagesForMongoSearch = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
-const symbolsTranslationsLanguages = ['fi', 'el', 'ro', 'sk', 'iw', 'fr', 'de', 'es', 'pt', 'ru', 'ja', 'sv', 'nl', 'da', 'hu', 'pl', 'no', 'ko', 'th', 'tr', 'cs', 'ar'];
+const symbolsTranslationsLanguages = ['en', 'fi', 'el', 'ro', 'sk', 'iw', 'fr', 'de', 'es', 'pt', 'ru', 'ja', 'sv', 'nl', 'da', 'hu', 'pl', 'no', 'ko', 'th', 'tr', 'cs', 'ar'];
+const supportedRepos = ['all', 'arasaac', 'sclera', 'mulberry', 'tawasol'];
 //const supportedLanguages = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
 
 //var stopWords = require('../../data/stopwords/en.txt');
@@ -19,7 +20,11 @@ module.exports = function (app, db) {
         console.log(id);
         //const details = { '_id': new ObjectID(id) };
         const details = { 'id': +id };
-        db.collection('symbols').findOne(details)
+        db.collection('symbols').findOne(details, {
+            fields: {
+                "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, "translations": 1,
+            }
+        })
             .then((item) => {
                 console.log(item);
                 if (!item) {
@@ -37,28 +42,32 @@ module.exports = function (app, db) {
         // ------ Get prams form qouery -------
         var query = req.query.name || "";
         if (query == "") { // if no query then out
-            res.send('no query');
+            res.status(480);
+            res.send({error: 'no query'});
             return;
         }
-        var lang = req.query.lang || "en";
-        //console.log(lang);
         var repo = req.query.repo || "all";
+        if (!supportedRepos.includes(repo)) {
+            repo = "all";
+        }
         //console.log(repo);
-        var limit = +req.query.limit || 20; 
+        var limit = +req.query.limit || 20;
         if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
         //console.log(limit);
         //query = query.toLowerCase();
         //console.log(query);
-        let detectedLang = (symbolsTranslationsLanguages.includes(lang))? lang : "en"; // language to retrun at symbol (if not supprted then english)
+        var lang = req.query.lang || "en";
+        //console.log(lang);
+        let detectedLang = (symbolsTranslationsLanguages.includes(lang)) ? lang : "en"; // language to retrun at symbol (if not supprted then english)
         let langForText = (supportedLanguagesForMongoSearch.includes(lang)) ? lang : 'none'; // language for mongo text search, if not supprted then do text search without stimming and stp words
         let isStopWord = false;
-        if ((supportedLanguagesForMongoSearch.includes(lang))) { 
+        if ((supportedLanguagesForMongoSearch.includes(lang))) {
             let data = fs.readFileSync(path.join(__dirname, '../stop_words/' + langForText + '.txt'));
             //console.log('data.includes(query):');
             //console.log(data.includes(query));
             isStopWord = data.includes(query);
         }
-        if (query.length == 1 ||  Number.isInteger(+query)) isStopWord = true; // if user searching one letter or number then set it as stopWord
+        if (query.length == 1 || Number.isInteger(+query)) isStopWord = true; // if user searching one letter or number then set it as stopWord
         if (isStopWord) langForText = "none";
         let curser;
         if (!isStopWord) {
@@ -70,7 +79,7 @@ module.exports = function (app, db) {
                 })
                 .limit(limit)
                 .project({
-                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, //"search_string": 1,  "extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
                 .sort({ score: { $meta: "textScore" } });
@@ -101,7 +110,7 @@ module.exports = function (app, db) {
                 })
                 .limit(100)//limit
                 .project({
-                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, "id": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, //"search_string": 1,  "extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
             //.sort({ score: { $meta: "textScore" } });
@@ -120,7 +129,8 @@ module.exports = function (app, db) {
                 //newCurser.toArray().then(newArr => {
                 //console.log("found " + newArr.length + " results");
                 //if (newArr.length == 0) {
-                res.send('no result');
+                res.status(480);
+                res.send({error: 'no result'});
                 //} else {
                 //res.send(newArr);
                 //}
@@ -146,7 +156,9 @@ module.exports = function (app, db) {
             }
         }).catch(e => {
             console.log(e);
-            res.send({ 'error': 'An error has occurred: /n' + e });
+            res.status(480);
+            res.send({error: 'An error has occurred: /n' + e });
+            //res.send({ 'error': 'An error has occurred: /n' + e });
         });
         //});
     });
@@ -154,6 +166,13 @@ module.exports = function (app, db) {
     app.post('/symbols', (req, res) => {
         // You'll create your note here.
         console.log(req.body);
+
+        const token = req.headers.token;
+        //console.log(token);
+
+        if (!token || token != adminToken) {
+            return res.send('Not authorized');
+        }
         //console.log(req.query);
         const symbol = { name: req.body.name, img_src: req.body.img_src };
         db.collection('symbols').insert(symbol, (err, result) => {
