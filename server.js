@@ -20,7 +20,7 @@ app.use('/static', express.static('public'))
     console.log('mLab db live');
 }) */
 
-MongoClient.connect(db.mlabUrlNew, (err, database) => {//mlabUrlNew
+MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
     if (err) return console.log(err)
     var myDB = database.db('symbolsapi');//mLab
     //var myDB = database.db('SymbolsDB');//mongoDb Atlas
