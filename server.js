@@ -22,8 +22,8 @@ app.use('/static', express.static('public'))
 
 MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
     if (err) return console.log(err)
-    var myDB = database.db('symbolsapi');//mLab
-    //var myDB = database.db('SymbolsDB');//mongoDb Atlas
+    //var myDB = database.db('symbolsapi');//mLab
+    var myDB = database.db('SymbolsDB');//mongoDb Atlas
     require('./app/routes')(app, myDB);
     app.listen(port, () => {
         console.log('We are live on ' + port);
