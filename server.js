@@ -29,13 +29,23 @@ MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
         console.log('We are live on ' + port);
     });
     //myDB.collection('symbols').dropIndexes();
-    myDB.collection('symbols').createIndex(
+    /* myDB.collection('symbols').createIndex(
         { name : "text", "translations.tName" : "text" },
         { default_language: "none" }
     ); 
     myDB.collection('symbols').createIndex(
         { id : 1 }
-    ); 
+    ); */
+    setInterval(()=>{
+         let start = myDB.collection('symbols').find({id: 1})
+        .project({id: 1})
+        .limit(1)
+        .sort({id: 1});
+        start.toArray().then(res=>{
+            console.log(res);
+        })
+
+    }, 60000);
     /* myDB.collection('symbols').createIndex(
         { "translations.tName" : "text" }
     ); */
