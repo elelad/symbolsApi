@@ -79,10 +79,11 @@ module.exports = function (app, db) {
                 })
                 .limit(limit)
                 .project({
-                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, //"search_string": 1,  "extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
+                    score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, //"search_string": 1,  "extension": 1, "_id": 1,"author_url": 1,  //"translations": { $slice: -1 }, , "translations.tLang" : 0
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
-                .sort({ score: { $meta: "textScore" } });
+                .sort({ score: { $meta: "textScore" } })
+                .maxTimeMS(500);
         } /* else if(query.length == 1) {
             console.log('one letter');
             curser = db.collection('symbols').find(
@@ -108,11 +109,12 @@ module.exports = function (app, db) {
                     //name: query,
                     //"translations.tName": query
                 })
-                .limit(100)//limit
+                .limit(70)//limit
                 .project({
                     score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, //"search_string": 1,  "extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
+                .maxTimeMS(500);
             //.sort({ score: { $meta: "textScore" } });
             /* curser = db.collection('symbols').aggregate([
                 { $match: {name: query}},//(query == 'a') ? query : { $regex: ".*" + query + ".*" } 
