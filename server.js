@@ -33,6 +33,9 @@ MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
         { name : "text", "translations.tName" : "text" },
         { default_language: "none" }
     ); 
+    myDB.collection('symbols').createIndex(
+        { id : 1 }
+    ); 
     /* myDB.collection('symbols').createIndex(
         { "translations.tName" : "text" }
     ); */
