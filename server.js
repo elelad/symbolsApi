@@ -29,10 +29,10 @@ MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
         console.log('We are live on ' + port);
     });
     //myDB.collection('symbols').dropIndexes();
-    /* myDB.collection('symbols').createIndex(
+    myDB.collection('symbols').createIndex(
         { name : "text", "translations.tName" : "text" },
         { default_language: "none" }
-    );  */
+    ); 
     /* myDB.collection('symbols').createIndex(
         { "translations.tName" : "text" }
     ); */
