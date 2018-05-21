@@ -43,7 +43,7 @@ module.exports = function (app, db) {
         var query = req.query.name || "";
         if (query == "") { // if no query then out
             //res.status(480);
-            res.send({error: 'no query'});
+            res.send('no query');
             return;
         }
         var repo = req.query.repo || "all";
@@ -132,7 +132,7 @@ module.exports = function (app, db) {
                 //console.log("found " + newArr.length + " results");
                 //if (newArr.length == 0) {
                 //res.status(480);
-                res.send({error: 'no result'});
+                res.send('no result');
                 //} else {
                 //res.send(newArr);
                 //}
@@ -159,7 +159,7 @@ module.exports = function (app, db) {
         }).catch(e => {
             console.log(e);
             res.status(480);
-            res.send({error: 'An error has occurred: /n' + e });
+            res.send({error: 'An error has occurred'});
             //res.send({ 'error': 'An error has occurred: /n' + e });
         });
         //});
