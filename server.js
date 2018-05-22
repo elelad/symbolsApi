@@ -14,9 +14,9 @@ var RateLimit = require('express-rate-limit');
 var mLabDb;
 
 var limiter = new RateLimit({
-    //windowMs: 15*60*1000, // 15 minutes
-    windowMs: 10*1000, // 10 seconds
-    max: 2, // limit each IP to 100 requests per windowMs
+    windowMs: 15*60*1000, // 15 minutes
+    //windowMs: 10*1000, // 10 seconds
+    max: 500, // limit each IP to 100 requests per windowMs
     delayMs: 0, // disable delaying - full speed until the max limit is reached
     //message: "Too many accounts created from this IP, please try again after an hour"
   });
