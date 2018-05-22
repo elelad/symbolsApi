@@ -3,12 +3,29 @@ const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 const db = require('./config/db');
 const app = express();
+const port = process.env.PORT || 1337;//8000;
+const redisClient = require('redis').createClient();
+const limiter = require('express-limiter')(app, redisClient);
 //const firebase = require('./firebase');
 //const buildDb = require('./buildDB');
 var mLabDb;
 
 
-const port = process.env.PORT || 1337;//8000;
+
+// Limit requests to 100 per hour per ip address.
+limiter({
+  lookup: ['connection.remoteAddress'],
+  total: 500,// requessts
+  expire: 1000 * 60 * 60, //per hour
+  onRateLimited: (req, res, next) =>{
+    res.status(429);
+    res.send('Rate limit exceeded')
+  }
+})
+
+
+
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
