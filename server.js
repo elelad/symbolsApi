@@ -4,13 +4,25 @@ const bodyParser = require('body-parser');
 const db = require('./config/db');
 const app = express();
 const port = process.env.PORT || 1337;//8000;
-var helmet = require('helmet')
+var helmet = require('helmet');
+var RateLimit = require('express-rate-limit');
 
 //const redisClient = require('redis').createClient();
 //const limiter = require('express-limiter')(app, redisClient);
 //const firebase = require('./firebase');
 //const buildDb = require('./buildDB');
 var mLabDb;
+
+var limiter = new RateLimit({
+    //windowMs: 15*60*1000, // 15 minutes
+    windowMs: 10*1000, // 10 seconds
+    max: 2, // limit each IP to 100 requests per windowMs
+    delayMs: 0, // disable delaying - full speed until the max limit is reached
+    //message: "Too many accounts created from this IP, please try again after an hour"
+  });
+  
+  //  apply to all requests
+  app.use(limiter);
 
 /* redisClient.on("error", function (err) {
     console.log("Error " + err);

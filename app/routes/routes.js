@@ -251,3 +251,7 @@ module.exports = function (app, db) {
         //res.sendFile(path.join(__dirname + '../../../public/index.html'));
     });
 };
+
+function validate(path){
+
+}
