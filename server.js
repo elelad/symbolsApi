@@ -4,19 +4,21 @@ const bodyParser = require('body-parser');
 const db = require('./config/db');
 const app = express();
 const port = process.env.PORT || 1337;//8000;
-const redisClient = require('redis').createClient();
-const limiter = require('express-limiter')(app, redisClient);
+var helmet = require('helmet')
+
+//const redisClient = require('redis').createClient();
+//const limiter = require('express-limiter')(app, redisClient);
 //const firebase = require('./firebase');
 //const buildDb = require('./buildDB');
 var mLabDb;
 
-redisClient.on("error", function (err) {
+/* redisClient.on("error", function (err) {
     console.log("Error " + err);
-});
+}); */
 
 
 // Limit requests to 100 per hour per ip address.
-limiter({
+/* limiter({
   path: '*',
   method: 'all',
   lookup: ['connection.remoteAddress'],
@@ -28,7 +30,7 @@ limiter({
     res.status(429);
     res.send('Rate limit exceeded')
   }
-})
+}) */
 
 
 
@@ -39,6 +41,7 @@ limiter({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/static', express.static('public'))
+app.use(helmet())
 
 
 /* MongoClient.connect(db.mlabUrlNew, (err, database) => {
