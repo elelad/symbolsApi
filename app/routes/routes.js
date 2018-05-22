@@ -279,6 +279,8 @@ function validateSearch(req, res, next) {
         res.status(400);
         res.send('too large query');
         return;
+    } else{
+        next();
     }
 }
 
