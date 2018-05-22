@@ -14,7 +14,7 @@ const supportedRepos = ['all', 'arasaac', 'sclera', 'mulberry', 'tawasol'];
 
 module.exports = function (app, db) {
 
-
+    app.get('/symbols/:id', validateId);
     app.get('/symbols/:id', (req, res) => {
         const id = req.params.id;
         console.log(id);
@@ -28,24 +28,25 @@ module.exports = function (app, db) {
             .then((item) => {
                 console.log(item);
                 if (!item) {
-                    res.send({ 'error': 'An error has occurred' });
+                    res.status(200);
+                    res.send('no symbols found');
                 } else {
+                    res.status(200);
                     res.send(item);
                 }
-            }).catch(e => console.log(e));
+            }).catch(e => {
+                console.log(e);
+                res.status(500);
+                res.send('An error has occurred');
+            });
     });
 
-
-
+    app.get('/search', validateSearch);
     app.get('/search', (req, res) => {
         //console.log(req.query);
         // ------ Get prams form qouery -------
         var query = req.query.name || "";
-        if (query == "") { // if no query then out
-            //res.status(480);
-            res.send('no query');
-            return;
-        }
+
         var repo = req.query.repo || "all";
         if (!supportedRepos.includes(repo)) {
             repo = "all";
@@ -132,6 +133,7 @@ module.exports = function (app, db) {
                 //console.log("found " + newArr.length + " results");
                 //if (newArr.length == 0) {
                 //res.status(480);
+                res.status(200);
                 res.send('no result');
                 //} else {
                 //res.send(newArr);
@@ -158,33 +160,30 @@ module.exports = function (app, db) {
             }
         }).catch(e => {
             console.log(e);
-            res.status(480);
-            res.send({error: 'An error has occurred'});
+            res.status(500);
+            res.send('An error has occurred');
             //res.send({ 'error': 'An error has occurred: /n' + e });
         });
         //});
     });
 
+    app.post('*', auth);
     app.post('/symbols', (req, res) => {
         // You'll create your note here.
         console.log(req.body);
-
-        const token = req.headers.token;
-        //console.log(token);
-
-        if (!token || token != adminToken) {
-            return res.send('Not authorized');
-        }
         //console.log(req.query);
         const symbol = { name: req.body.name, img_src: req.body.img_src };
         db.collection('symbols').insert(symbol, (err, result) => {
             if (err) {
-                res.send({ 'error': 'An error has occurred' });
+                res.status(500);
+                res.send('An error has occurred');
             } else {
+                res.status(200);
                 res.send(result.ops[0]);
             }
         });
     });
+
 
     /* app.delete('/symbols/:id', (req, res) => {
         const id = req.params.id;
@@ -197,17 +196,12 @@ module.exports = function (app, db) {
             }
         });
     }); */
-
+    app.put('*', auth);
     app.put('/symbols/:id', (req, res) => {
         const id = { id: +req.params.id }; //+to convert string to number
         //console.log(id);
         //console.log(req.body.name);
-        const token = req.headers.token;
-        //console.log(token);
 
-        if (!token || token != adminToken) {
-            return res.send('Not authorized');
-        }
         const symbol = {
             //_id: req.body._id,
             id: req.body.id,
@@ -230,15 +224,18 @@ module.exports = function (app, db) {
             || !symbol.repo_key || !symbol.extension || !symbol.image_url || !symbol.alt_url
             || !symbol.search_string || !symbol.unsafe_result.toString() || !symbol.translations //|| !symbol.source_url 
         ) {
+            res.status(400);
             return res.send({ 'error': 'Not a Symbol' });
         } else {
             console.log('symbol');
             //res.send('symbol');
             db.collection('symbols').update(id, symbol, { upsert: true }).then((d) => {//, 
                 console.log('symbol ' + symbol.id + ' updated on the new db');
+                res.status(200);
                 res.send('Update Done');
             }).catch(e => {
-                res.send({ 'error': 'An error has occurred ' + e });
+                res.status(500);
+                res.send('An error has occurred');
                 //errorsArray.push(doc.id);
                 //console.log(errorsArray);
             });
@@ -246,12 +243,52 @@ module.exports = function (app, db) {
     });
 
     app.get('/', (req, res) => {
-        res.send('Welcome to SymboTalk API V1');
+        res.status(200);
+        res.send('Welcome to SymboTalk API, for more data go to our docs: https://elelad.github.io/SymboTalkAPIDocs');
         //dir = "public";
         //res.sendFile(path.join(__dirname + '../../../public/index.html'));
     });
+
+    app.get('*', function(req, res){
+        res.status(401);
+        res.send('no such path, for more data go to our docs: https://elelad.github.io/SymboTalkAPIDocs');
+    });
 };
 
-function validate(path){
+function validateId(req, res, next) {
+    const idNum = +req.params.id;
 
+    if (!Number.isInteger(idNum)) {
+        res.status(400);
+        res.send('id must be an integer number');
+    } else if (idNum > 99999 || idNum < 0) {
+        res.status(400);
+        res.send('id must be between 0 to 99999');
+    } else {
+        next();
+    }
+}
+
+function validateSearch(req, res, next) {
+    var query = req.query.name || "";
+    if (query == "") { // if no query then out
+        res.status(400);
+        res.send('no query');
+        return;
+    } else if (query.length > 30) {
+        res.status(400);
+        res.send('too large query');
+        return;
+    }
+}
+
+function auth(req, res, next) {
+    const token = req.headers.token;
+    //console.log(token);
+    if (!token || token != adminToken) {
+        res.status(401);
+        return res.send('Not authorized');
+    } else {
+        next();
+    }
 }
