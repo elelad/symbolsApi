@@ -4,24 +4,33 @@ const bodyParser = require('body-parser');
 const db = require('./config/db');
 const app = express();
 const port = process.env.PORT || 1337;//8000;
-/* const redisClient = require('redis').createClient();
-const limiter = require('express-limiter')(app, redisClient); */
+const redisClient = require('redis').createClient();
+const limiter = require('express-limiter')(app, redisClient);
 //const firebase = require('./firebase');
 //const buildDb = require('./buildDB');
 var mLabDb;
 
+redisClient.on("error", function (err) {
+    console.log("Error " + err);
+});
 
 
 // Limit requests to 100 per hour per ip address.
-/* limiter({
+limiter({
+  path: '*',
+  method: 'all',
   lookup: ['connection.remoteAddress'],
-  total: 500,// requessts
-  expire: 1000 * 60 * 60, //per hour
+  total: 2,// requessts
+  //expire: 1000 * 60 * 60, //per hour
+  expire: 1000 * 10, //per 10 seconds
   onRateLimited: (req, res, next) =>{
+      console.log('Rate limit exceeded');
     res.status(429);
     res.send('Rate limit exceeded')
   }
-}) */
+})
+
+
 
 
 
@@ -53,7 +62,7 @@ MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
     myDB.collection('symbols').createIndex(
         { id : 1 }
     ); */
-    setInterval(()=>{
+    /* setInterval(()=>{
          let start = myDB.collection('symbols').find({id: 1})
         .project({id: 1})
         .limit(1)
@@ -62,7 +71,7 @@ MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
             console.log(res);
         })
 
-    }, 30000);
+    }, 30000); */
     /* myDB.collection('symbols').createIndex(
         { "translations.tName" : "text" }
     ); */
