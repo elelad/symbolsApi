@@ -14,15 +14,15 @@ var RateLimit = require('express-rate-limit');
 var mLabDb;
 
 var limiter = new RateLimit({
-    windowMs: 15*60*1000, // 15 minutes
+    windowMs: 15 * 60 * 1000, // 15 minutes
     //windowMs: 10*1000, // 10 seconds
     max: 500, // limit each IP to 100 requests per windowMs
     delayMs: 0, // disable delaying - full speed until the max limit is reached
     //message: "Too many accounts created from this IP, please try again after an hour"
-  });
-  
-  //  apply to all requests
-  app.use(limiter);
+});
+
+//  apply to all requests
+app.use(limiter);
 
 /* redisClient.on("error", function (err) {
     console.log("Error " + err);
@@ -61,20 +61,27 @@ app.use(helmet())
     console.log('mLab db live');
 }) */
 
-MongoClient.connect(db.url, (err, database) => {//mlabUrlNew  mlabUrlNew
+MongoClient.connect(db.mlabUrlNew, (err, database) => {//mlabUrlNew  mlabUrlNew
     if (err) return console.log(err)
-    //var myDB = database.db('symbolsapi');//mLab
-    var myDB = database.db('SymbolsDB');//mongoDb Atlas
+    var myDB = database.db('symbolsapi');//mLab
+    //var myDB = database.db('SymbolsDB');//mongoDb Atlas
     require('./app/routes')(app, myDB);
     app.listen(port, () => {
         console.log('We are live on ' + port);
     });
-    //myDB.collection('symbols').dropIndexes();
+
+    /* myDB.collection('symbols-lang').dropIndexes();
+    myDB.collection('symbols-lang').createIndex(
+        { name: "text", "translations.tName": "text" },
+        {
+            default_language: "none",
+            weights: {
+                "translations.tName": 10,
+                //name: 5
+            }
+        }
+    ); */
     /* myDB.collection('symbols').createIndex(
-        { name : "text", "translations.tName" : "text" },
-        { default_language: "none" }
-    ); 
-    myDB.collection('symbols').createIndex(
         { id : 1 }
     ); */
     /* setInterval(()=>{

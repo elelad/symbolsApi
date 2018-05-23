@@ -8,6 +8,7 @@ var path = require('path');
 const supportedLanguagesForMongoSearch = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
 const symbolsTranslationsLanguages = ['en', 'fi', 'el', 'ro', 'sk', 'iw', 'fr', 'de', 'es', 'pt', 'ru', 'ja', 'sv', 'nl', 'da', 'hu', 'pl', 'no', 'ko', 'th', 'tr', 'cs', 'ar'];
 const supportedRepos = ['all', 'arasaac', 'sclera', 'mulberry', 'tawasol'];
+const collection = "symbols-lang";//symbols
 //const supportedLanguages = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
 
 //var stopWords = require('../../data/stopwords/en.txt');
@@ -20,9 +21,10 @@ module.exports = function (app, db) {
         console.log(id);
         //const details = { '_id': new ObjectID(id) };
         const details = { 'id': +id };
-        db.collection('symbols').findOne(details, {
+        db.collection(collection).findOne(details, {
             fields: {
-                "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, "translations": 1,
+                //"name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, "translations": 1,
+                "_id": 0
             }
         })
             .then((item) => {
@@ -73,10 +75,11 @@ module.exports = function (app, db) {
         let curser;
         if (!isStopWord) {
             console.log('not stop word, langForText: ' + langForText);
-            curser = db.collection('symbols')
+            console.log('Searching: ' + query);
+            curser = db.collection(collection)
                 .find({
                     repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
-                    $text: { $language: langForText, $search: query },//'none'lang     
+                    $text: { $language: langForText, $search: query },//'none'lang 
                 })
                 .limit(limit)
                 .project({
@@ -84,7 +87,7 @@ module.exports = function (app, db) {
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
                 .sort({ score: { $meta: "textScore" } })
-                .maxTimeMS(500);
+                //.maxTimeMS(500);
         } /* else if(query.length == 1) {
             console.log('one letter');
             curser = db.collection('symbols').find(
@@ -101,7 +104,7 @@ module.exports = function (app, db) {
             console.log('stop word');
             console.log(query.toUpperCase());
             console.log(query.toLowerCase());
-            curser = db.collection('symbols')
+            curser = db.collection(collection)
                 .find({
                     repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
                     "translations": { $elemMatch: { tLang: detectedLang, tName: { $regex: "(^|\ )" + "(" + query + "|" + query.toLowerCase() + "|" + query.toUpperCase() + ")" + "($|\ ).*" } } },
@@ -173,7 +176,7 @@ module.exports = function (app, db) {
         console.log(req.body);
         //console.log(req.query);
         const symbol = { name: req.body.name, img_src: req.body.img_src };
-        db.collection('symbols').insert(symbol, (err, result) => {
+        db.collection(collection).insert(symbol, (err, result) => {
             if (err) {
                 res.status(500);
                 res.send('An error has occurred');
@@ -229,7 +232,7 @@ module.exports = function (app, db) {
         } else {
             console.log('symbol');
             //res.send('symbol');
-            db.collection('symbols').update(id, symbol, { upsert: true }).then((d) => {//, 
+            db.collection(collection).update(id, symbol, { upsert: true }).then((d) => {//, 
                 console.log('symbol ' + symbol.id + ' updated on the new db');
                 res.status(200);
                 res.send('Update Done');
