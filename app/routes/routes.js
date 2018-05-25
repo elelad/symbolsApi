@@ -9,6 +9,7 @@ const supportedLanguagesForMongoSearch = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'h
 const symbolsTranslationsLanguages = ['en', 'fi', 'el', 'ro', 'sk', 'iw', 'fr', 'de', 'es', 'pt', 'ru', 'ja', 'sv', 'nl', 'da', 'hu', 'pl', 'no', 'ko', 'th', 'tr', 'cs', 'ar'];
 const supportedRepos = ['all', 'arasaac', 'sclera', 'mulberry', 'tawasol'];
 const collection = "symbols-lang";//symbols
+const request = require("request");
 //const supportedLanguages = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
 
 //var stopWords = require('../../data/stopwords/en.txt');
@@ -44,7 +45,7 @@ module.exports = function (app, db) {
     });
 
     app.get('/search', validateSearch);
-    app.get('/search', (req, res) => {
+    app.get('/search', async (req, res) => {
         //console.log(req.query);
         // ------ Get prams form qouery -------
         var query = req.query.name || "";
@@ -53,6 +54,7 @@ module.exports = function (app, db) {
         if (!supportedRepos.includes(repo)) {
             repo = "all";
         }
+
         //console.log(repo);
         var limit = +req.query.limit || 20;
         if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
@@ -60,6 +62,7 @@ module.exports = function (app, db) {
         //query = query.toLowerCase();
         //console.log(query);
         var lang = req.query.lang || "en";
+
         //console.log(lang);
         let detectedLang = (symbolsTranslationsLanguages.includes(lang)) ? lang : "en"; // language to retrun at symbol (if not supprted then english)
         let langForText = (supportedLanguagesForMongoSearch.includes(lang)) ? lang : 'none'; // language for mongo text search, if not supprted then do text search without stimming and stp words
@@ -79,7 +82,7 @@ module.exports = function (app, db) {
             curser = db.collection(collection)
                 .find({
                     repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
-                    $text: { $language: langForText, $search: query },//'none'lang 
+                    $text: { $language: langForText, $search: query, $diacriticSensitive: true },//'none'lang
                 })
                 .limit(limit)
                 .project({
@@ -87,7 +90,7 @@ module.exports = function (app, db) {
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
                 .sort({ score: { $meta: "textScore" } })
-                //.maxTimeMS(500);
+            //.maxTimeMS(500);
         } /* else if(query.length == 1) {
             console.log('one letter');
             curser = db.collection('symbols').find(
@@ -159,6 +162,7 @@ module.exports = function (app, db) {
                     });
                 }
                 arr = arr.slice(0, limit);
+                res.status(200);
                 res.send(arr);
             }
         }).catch(e => {
@@ -168,6 +172,21 @@ module.exports = function (app, db) {
             //res.send({ 'error': 'An error has occurred: /n' + e });
         });
         //});
+    });
+
+    app.get('/arasaac', validateSearch);
+    app.get('/arasaac', async (req, res) => {
+        var query = req.query.name || "";
+        var limit = +req.query.limit || 20;
+        if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
+        var lang = req.query.lang || "en";
+        let symbols = await searchArasaac(query, lang, limit).catch(e => {
+            res.status(500);
+            res.send('An error has occurred');
+        })
+        res.status(200);
+        return res.send(symbols);
+
     });
 
     app.post('*', auth);
@@ -252,7 +271,7 @@ module.exports = function (app, db) {
         //res.sendFile(path.join(__dirname + '../../../public/index.html'));
     });
 
-    app.get('*', function(req, res){
+    app.get('*', function (req, res) {
         res.status(401);
         res.send('no such path, for more data go to our docs: https://elelad.github.io/SymboTalkAPIDocs');
     });
@@ -282,7 +301,7 @@ function validateSearch(req, res, next) {
         res.status(400);
         res.send('too large query');
         return;
-    } else{
+    } else {
         next();
     }
 }
@@ -296,4 +315,49 @@ function auth(req, res, next) {
     } else {
         next();
     }
+}
+
+function searchArasaac(query, lang, limit) {
+    return new Promise((res, rej) => {
+        console.log('arasaac search started');
+        if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
+        var options = {
+            method: 'GET',
+            url: 'https://api.arasaac.org/api/pictograms/' + lang + '/search/' + query,
+            /* headers:
+                {
+                    
+                    'Cache-Control': 'no-cache',
+                    'Content-Type': 'application/json'
+                }, */
+        };
+
+        request(options, function (error, response, body) {
+            if (error) return rej(error);
+            //console.log(body);
+            res(arasaacToSymbol(JSON.parse(body)));
+        });
+    })
+}
+
+function arasaacToSymbol(arasaacResults) {
+    let symbols = [];
+    arasaacResults.forEach(ara => {
+        let symbol = {
+            name: ara.keywords[0].keyword,
+            license: ara.license,
+            license_url: "",
+            author: ara.authors[0].name,
+            author_url: ara.authors[0].url,
+            source_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '_2500.png',
+            repo_key: 'arasaac',
+            extension: 'png',
+            image_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '_300.png',
+            alt_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '_500.png',
+            unsafe_result: false,
+        }
+        symbols.push(symbol);
+    })
+    console.log(symbols);
+    return symbols;
 }

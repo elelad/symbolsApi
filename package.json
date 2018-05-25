@@ -15,7 +15,8 @@
     "express": "^4.16.2",
     "express-rate-limit": "^2.11.0",
     "helmet": "^3.12.1",
-    "mongodb": "^3.0.1"
+    "mongodb": "^3.0.1",
+    "request": "^2.87.0"
   },
   "devDependencies": {
     "nodemon": "^1.14.11",
