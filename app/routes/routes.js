@@ -45,7 +45,7 @@ module.exports = function (app, db) {
     });
 
     app.get('/search', validateSearch);
-    app.get('/search', async (req, res) => {
+    app.get('/search', (req, res) => {
         //console.log(req.query);
         // ------ Get prams form qouery -------
         var query = req.query.name || "";
@@ -175,18 +175,20 @@ module.exports = function (app, db) {
     });
 
     app.get('/arasaac', validateSearch);
-    app.get('/arasaac', async (req, res) => {
+    app.get('/arasaac', (req, res) => {
         var query = req.query.name || "";
         var limit = +req.query.limit || 20;
         if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
         var lang = req.query.lang || "en";
-        let symbols = await searchArasaac(query, lang, limit).catch(e => {
+        searchArasaac(query, lang, limit)
+        .then(symbols=>{
+            res.status(200);
+        return res.send(symbols);
+        })
+        .catch(e => {
             res.status(500);
             res.send('An error has occurred');
         })
-        res.status(200);
-        return res.send(symbols);
-
     });
 
     app.post('*', auth);
