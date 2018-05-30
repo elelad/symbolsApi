@@ -90,7 +90,7 @@ MongoClient.connect(db.mlabUrlNew, (err, database) => {//mlabUrlNew  mlabUrlNew
         .limit(1)
         .sort({id: 1});
         start.toArray().then(res=>{
-            console.log(res);
+            //console.log(res);
         })
 
     }, 20000);
