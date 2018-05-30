@@ -84,7 +84,7 @@ MongoClient.connect(db.mlabUrlNew, (err, database) => {//mlabUrlNew  mlabUrlNew
     /* myDB.collection('symbols').createIndex(
         { id : 1 }
     ); */
-    /* setInterval(()=>{
+    setInterval(()=>{
          let start = myDB.collection('symbols').find({id: 1})
         .project({id: 1})
         .limit(1)
@@ -93,7 +93,7 @@ MongoClient.connect(db.mlabUrlNew, (err, database) => {//mlabUrlNew  mlabUrlNew
             console.log(res);
         })
 
-    }, 30000); */
+    }, 20000);
     /* myDB.collection('symbols').createIndex(
         { "translations.tName" : "text" }
     ); */
