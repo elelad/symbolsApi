@@ -82,7 +82,7 @@ module.exports = function (app, db) {
             curser = db.collection(collection)
                 .find({
                     repo_key: (repo != "all") ? { $eq: repo } : { $ne: "" }, //{$regex :}
-                    $text: { $language: langForText, $search: query, $diacriticSensitive: true },//'none'lang
+                    $text: { $language: langForText, $search: query, $diacriticSensitive: true },//'none'lang// langForText
                 })
                 .limit(limit)
                 .project({
@@ -121,7 +121,7 @@ module.exports = function (app, db) {
                     score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, //"search_string": 1,  "extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
-                .maxTimeMS(500);
+                //.maxTimeMS(500);
             //.sort({ score: { $meta: "textScore" } });
             /* curser = db.collection('symbols').aggregate([
                 { $match: {name: query}},//(query == 'a') ? query : { $regex: ".*" + query + ".*" } 
