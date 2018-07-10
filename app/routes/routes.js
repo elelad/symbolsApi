@@ -251,7 +251,7 @@ module.exports = function (app, db) {
             res.status(400);
             return res.send({ 'error': 'Not a Symbol' });
         } else {
-            console.log('symbol');
+            console.log(symbol);
             //res.send('symbol');
             db.collection(collection).update(id, symbol, { upsert: true }).then((d) => {//, 
                 console.log('symbol ' + symbol.id + ' updated on the new db');
