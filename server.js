@@ -6,6 +6,7 @@ const app = express();
 const port = process.env.PORT || 1337;//8000;
 var helmet = require('helmet');
 var RateLimit = require('express-rate-limit');
+const https = require('https');
 
 //const redisClient = require('redis').createClient();
 //const limiter = require('express-limiter')(app, redisClient);
@@ -92,6 +93,10 @@ MongoClient.connect(db.mlabUrlNew, (err, database) => {//mlabUrlNew  mlabUrlNew
         start.toArray().then(res=>{
             //console.log(res);
         })
+
+        https.get('https://symbotalkapiv1.azurewebsites.net', ()=>{
+            console.log('keeping the instance alive');
+        });
 
     }, 20000);
     /* myDB.collection('symbols').createIndex(
