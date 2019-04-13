@@ -344,18 +344,20 @@ function searchArasaac(query, lang, limit) {
 
 function arasaacToSymbol(arasaacResults) {
     let symbols = [];
+    console.log(arasaacResults[0]);
     arasaacResults.forEach(ara => {
+        
         let symbol = {
             name: ara.keywords[0].keyword,
             license: ara.license,
             license_url: "",
             author: ara.authors[0].name,
             author_url: ara.authors[0].url,
-            source_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '_2500.png',
+            source_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '/' + ara.idPictogram + '_2500.png',
             repo_key: 'arasaac',
             extension: 'png',
-            image_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '_300.png',
-            alt_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '_500.png',
+            image_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '/' + ara.idPictogram + '_300.png',
+            alt_url: 'https://static.arasaac.org/pictograms/' + ara.idPictogram + '/' + ara.idPictogram + '_500.png',
             unsafe_result: false,
         }
         symbols.push(symbol);
