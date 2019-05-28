@@ -1,17 +1,15 @@
 
-//const tCLi = require('@google-cloud/translate')({ keyFilename: './SymboTalk-28a623274f93.json' });
-var ObjectID = require('mongodb').ObjectID;
+
 const fs = require('fs');
-const dbConfig = require('../../config/db');
-const adminToken = dbConfig.myToken;
+//const dbConfig = require('../../config/db');
+//const adminToken = dbConfig.myToken;
+const adminToken = process.env.ADMIN_TOKEN;
 var path = require('path');
 const supportedLanguagesForMongoSearch = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
 const symbolsTranslationsLanguages = ['en', 'fi', 'el', 'ro', 'sk', 'iw', 'fr', 'de', 'es', 'pt', 'ru', 'ja', 'sv', 'nl', 'da', 'hu', 'pl', 'no', 'ko', 'th', 'tr', 'cs', 'ar', 'ca'];
 const supportedRepos = ['all', 'arasaac', 'sclera', 'mulberry', 'tawasol'];
 const collection = "symbols-lang";//symbols
 const request = require("request");
-//const supportedLanguages = ['da', 'nl', 'en', 'fi', 'fr', 'de', 'hu', 'it', 'nb', 'pt', 'ro', 'ru', 'es', 'sv', 'tr'];
-
 //var stopWords = require('../../data/stopwords/en.txt');
 
 module.exports = function (app, db) {
@@ -20,7 +18,6 @@ module.exports = function (app, db) {
     app.get('/symbols/:id', (req, res) => {
         const id = req.params.id;
         console.log(id);
-        //const details = { '_id': new ObjectID(id) };
         const details = { 'id': +id };
         db.collection(collection).findOne(details, {
             fields: {
@@ -46,15 +43,12 @@ module.exports = function (app, db) {
 
     app.get('/search', validateSearch);
     app.get('/search', (req, res) => {
-        //console.log(req.query);
         // ------ Get prams form qouery -------
         var query = req.query.name || "";
-
         var repo = req.query.repo || "all";
         if (!supportedRepos.includes(repo)) {
             repo = "all";
         }
-
         //console.log(repo);
         var limit = +req.query.limit || 20;
         if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
@@ -62,7 +56,6 @@ module.exports = function (app, db) {
         //query = query.toLowerCase();
         //console.log(query);
         var lang = req.query.lang || "en";
-
         //console.log(lang);
         let detectedLang = (symbolsTranslationsLanguages.includes(lang)) ? lang : "en"; // language to retrun at symbol (if not supprted then english)
         let langForText = (supportedLanguagesForMongoSearch.includes(lang)) ? lang : 'none'; // language for mongo text search, if not supprted then do text search without stimming and stp words
@@ -91,19 +84,7 @@ module.exports = function (app, db) {
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
                 .sort({ score: { $meta: "textScore" } })
             //.maxTimeMS(500);
-        } /* else if(query.length == 1) {
-            console.log('one letter');
-            curser = db.collection('symbols').find(
-                {$or: [{ "name": query}, { "name": query.toLowerCase()}, { "name": query.toUpperCase()}, { "name": "letter" + query}, { "name": "number" + query}] }
-                ).limit(limit)
-                .project({
-                    "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
-                    translations: { $elemMatch: { tLang: detectedLang } },//len: { $strLenBytes: "$name"  }, 
-                     //{ tLang : {$regex : ".*iw.*"}}}//
-                })
-                //.sort({ len: -1 });//: { $strLenBytes: "$name" } 
-            
-        } */ else {
+        } else {
             console.log('stop word');
             console.log(query.toUpperCase());
             console.log(query.toLowerCase());
@@ -121,34 +102,14 @@ module.exports = function (app, db) {
                     score: { $meta: "textScore" }, "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "id": 1, //"search_string": 1,  "extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
                     translations: { $elemMatch: { tLang: detectedLang } }//{ tLang : {$regex : ".*iw.*"}}}//
                 })//tName: {"translations.tLang" : {$regex : ".*iw.*"}}
-                //.maxTimeMS(500);
-            //.sort({ score: { $meta: "textScore" } });
-            /* curser = db.collection('symbols').aggregate([
-                { $match: {name: query}},//(query == 'a') ? query : { $regex: ".*" + query + ".*" } 
-                { $project: { "name": 1, "license": 1, "license_url": 1, "author": 1, "author_url": 1, "repo_key": 1, "image_url": 1, "alt_url": 1, "search_string": 1, //"extension": 1, "_id": 1, //"translations": { $slice: -1 }, , "translations.tLang" : 0
-                translations: { $elemMatch: { tLang: detectedLang } }, len: { $strLenBytes: "$name" } } },
-                { $limit: limit },
-                {$sort: {len: -1} }
-            ]) */
+            //.maxTimeMS(500);
         }
         curser.toArray().then(arr => {
             console.log("found " + arr.length + " results");
             if (arr.length == 0) {
-                //let newCurser =
-                //newCurser.toArray().then(newArr => {
                 //console.log("found " + newArr.length + " results");
-                //if (newArr.length == 0) {
-                //res.status(480);
                 res.status(200);
                 res.send('no result');
-                //} else {
-                //res.send(newArr);
-                //}
-                /* }).catch(e => {
-                    console.log(e);
-                    res.send({ 'error': 'An error has occurred' });
-                }); */
-                //res.send('no result');
             } else {
                 if (isStopWord) {
                     arr.sort((a, b) => {
@@ -171,7 +132,6 @@ module.exports = function (app, db) {
             res.send('An error has occurred');
             //res.send({ 'error': 'An error has occurred: /n' + e });
         });
-        //});
     });
 
     app.get('/arasaac', validateSearch);
@@ -181,14 +141,14 @@ module.exports = function (app, db) {
         if (limit > 50) limit = 50; // Limit is limited to max 50 results defalut is 20
         var lang = req.query.lang || "en";
         searchArasaac(query, lang, limit)
-        .then(symbols=>{
-            res.status(200);
-        return res.send(symbols);
-        })
-        .catch(e => {
-            res.status(500);
-            res.send('An error has occurred');
-        })
+            .then(symbols => {
+                res.status(200);
+                return res.send(symbols);
+            })
+            .catch(e => {
+                res.status(500);
+                res.send('An error has occurred');
+            })
     });
 
     app.post('*', auth);
@@ -211,7 +171,6 @@ module.exports = function (app, db) {
 
     /* app.delete('/symbols/:id', (req, res) => {
         const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
         db.collection('symbols').remove(details, (err, item) => {
             if (err) {
                 res.send({ 'error': 'An error has occurred' });
@@ -225,7 +184,6 @@ module.exports = function (app, db) {
         const id = { id: +req.params.id }; //+to convert string to number
         //console.log(id);
         //console.log(req.body.name);
-
         const symbol = {
             //_id: req.body._id,
             id: req.body.id,
@@ -260,8 +218,6 @@ module.exports = function (app, db) {
             }).catch(e => {
                 res.status(500);
                 res.send('An error has occurred');
-                //errorsArray.push(doc.id);
-                //console.log(errorsArray);
             });
         }
     });
@@ -269,8 +225,6 @@ module.exports = function (app, db) {
     app.get('/', (req, res) => {
         res.status(200);
         res.send('Welcome to SymboTalk API, for more data go to our docs: https://elelad.github.io/SymboTalkAPIDocs');
-        //dir = "public";
-        //res.sendFile(path.join(__dirname + '../../../public/index.html'));
     });
 
     app.get('*', function (req, res) {
@@ -346,7 +300,7 @@ function arasaacToSymbol(arasaacResults) {
     let symbols = [];
     console.log(arasaacResults[0]);
     arasaacResults.forEach(ara => {
-        
+
         let symbol = {
             name: ara.keywords[0].keyword,
             license: ara.license,

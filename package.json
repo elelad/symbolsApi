@@ -1,6 +1,6 @@
 {
   "name": "symbolsapiv1",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "api for aac symbols",
   "main": "server.js",
   "scripts": {
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "dotenv": "^8.0.0",
     "express": "^4.16.2",
     "express-rate-limit": "^2.11.0",
     "helmet": "^3.12.1",
